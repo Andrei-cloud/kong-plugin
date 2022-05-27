@@ -1,0 +1,12 @@
+_format_version: "2.1"
+
+services:
+- name: NumberToWords
+  #url: https://mockbin.org/request
+  url: https://www.dataaccess.com/webservicesserver/NumberConversion.wso
+  plugins:
+  - name: num2word
+  routes:
+  - name: number_to_words
+    paths:
+    - /n2w
