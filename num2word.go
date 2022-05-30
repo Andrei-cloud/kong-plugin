@@ -108,7 +108,7 @@ func (conf Config) Response(kong *pdk.PDK) {
 			return
 		}
 		fmt.Print(buffer.String())
-
+		kong.Response.SetHeader("Content-Type", "application/json")
 		kong.Response.Exit(code, buffer.String(), nil)
 	}
 }
