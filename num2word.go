@@ -9,8 +9,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"kong-plugin/service"
+	"fmt"
 	"strings"
+
+	"kong-plugin/service"
 
 	"github.com/Kong/go-pdk"
 	"github.com/Kong/go-pdk/server"
@@ -73,29 +75,26 @@ func (conf Config) Response(kong *pdk.PDK) {
 		err  error
 	)
 
-	if code, err = kong.ServiceResponse.GetStatus(); err != nil {
+	if code, err = kong.Response.GetStatus(); err != nil {
 		kong.Log.Err(err.Error())
 	}
 
 	if code == 200 {
 		body, err := kong.ServiceResponse.GetRawBody()
 		if err != nil {
-			kong.Log.Debug("Error reading Body")
+			fmt.Print("Error reading Body")
 			kong.Log.Err(err.Error())
 			return
 		}
-		kong.Log.Debug(body)
 
 		response := service.NumberToWordsResponse{}
 
-		envelope := soap.SOAPEnvelope{
-			XmlNS: soap.XmlNsSoapEnv,
-			Body: soap.SOAPBody{
-				Content: &response,
-			},
+		respEnvelope := new(soap.SOAPEnvelopeResponse)
+		respEnvelope.Body = soap.SOAPBodyResponse{
+			Content: &response,
 		}
 
-		err = xml.NewDecoder(strings.NewReader(body)).Decode(&envelope)
+		err = xml.NewDecoder(strings.NewReader(body)).Decode(&respEnvelope)
 		if err != nil {
 			kong.Log.Err(err.Error())
 			return
@@ -108,6 +107,7 @@ func (conf Config) Response(kong *pdk.PDK) {
 			kong.Log.Err(err.Error())
 			return
 		}
+		fmt.Print(buffer.String())
 
 		kong.Response.Exit(code, buffer.String(), nil)
 	}
